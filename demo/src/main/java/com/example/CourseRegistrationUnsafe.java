@@ -7,6 +7,8 @@ import java.util.Map;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -121,16 +123,7 @@ class RegistrationGUI {
         dropBtn.addActionListener(e -> {
             String studentId = studentIdField.getText().trim();
             String course = targetCourseField.getText().trim();
-            if (!registrar.courses.containsKey(course)) {
-                appendOutput("[ERROR] Course '" + course + "' does not exist.\n");
-            } else {
-                boolean success = registrar.tryDrop(studentId, course);
-                if (success) {
-                    appendOutput("[INFO] Dropped '" + studentId + "' from '" + course + "'.\n");
-                } else {
-                    appendOutput("[WARN] Student '" + studentId + "' not found in course '" + course + "'.\n");
-                }
-            }
+            appendOutput(registrar.tryDrop(studentId, course));
         });
 
         addPriorityBtn.addActionListener(e -> {
@@ -161,9 +154,24 @@ class RegistrationGUI {
         });
 
         startStudentsBtn.addActionListener(e -> {
-            for (Student stud : registrar.students.values()) {
-                stud.start();
+            for (Map.Entry<String, Student> entry : registrar.students.entrySet()) {
+                Student old = entry.getValue();
+                // Make a fresh thread with the same data
+                Student fresh = new Student(old.getStudId(), old.getRegistrar(),
+                        new ArrayList<>(old.getMostDesired()),
+                        new ArrayList<>(old.getOk()),
+                        new HashSet<>(old.getCurrentCourses())
+                );
+                registrar.students.put(entry.getKey(), fresh); // replace with fresh thread
+                fresh.start();
             }
+            for (Student s : registrar.students.values()) {
+                try {
+                    s.join();
+                } catch (InterruptedException ignored) {
+                }
+            }
+            System.out.println("Student threads done.");
         });
 
         refreshBtn.addActionListener(e -> {

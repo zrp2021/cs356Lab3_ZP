@@ -51,7 +51,7 @@ public class Registrar {
             } else {
                 // delay to expose data race. Will allow too many students to join the course
                 try {
-                    Student.sleep(30); 
+                    Student.sleep(30);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -85,21 +85,31 @@ public class Registrar {
     /**
      * Tries to drop a student from a course
      */
-    public boolean tryDrop(String studentId, String courseName) {
-        Student stud = students.computeIfAbsent(studentId, k
-                -> new Student(studentId, this, new ArrayList<>(), new ArrayList<>(), new HashSet<>()));
+    public String tryDrop(String studentId, String courseName) {
+        Student stud = students.get(studentId);
+        if (stud == null) {
+            return "[ERROR] No student found with student id: " + studentId + "'.\n";
+        }
 
         Course c = courses.get(courseName);
+        if (c == null) {
+            return "[ERROR] Course '" + courseName + "' does not exist.\n";
+        }
+
         stud.dropCurrent(courseName);
-        
+
         // delay to expose data race. Student thinks they've dropped the course, but still enrolled in shared resource.
         try {
-            Student.sleep(30); 
+            Student.sleep(30);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        return c.enrolled.remove(studentId);
+        boolean success = c.enrolled.remove(studentId);
+        if (success) {
+            return "[INFO] Dropped '" + studentId + "' from '" + courseName + "'.\n";
+        }
+        return "[WARN] Student '" + studentId + "' not found in course '" + courseName + "'.\n";
     }
 
     /**

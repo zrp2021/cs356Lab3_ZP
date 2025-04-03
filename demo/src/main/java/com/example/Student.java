@@ -13,6 +13,9 @@ import java.util.Set;
  */
 public class Student extends Thread {
 
+    private static final int MAX_ATTEMPTS = 60;
+    private static final boolean VERBOSE = false;
+
     private final String id;
     private final Registrar registrar;
     private final List<String> mostDesired;
@@ -51,10 +54,12 @@ public class Student extends Thread {
     @Override
     public void run() {
         int attempts = 0;
-        while (attempts < 60) {
+        List<String> desired = new ArrayList<>(mostDesired);
+        desired.addAll(alsoOk);
+        String output;
+
+        while (attempts < MAX_ATTEMPTS) {
             attempts++;
-            List<String> desired = new ArrayList<>(mostDesired);
-            desired.addAll(alsoOk);
             Collections.shuffle(desired);
             for (String newCourse : desired) {
                 if (currentCourses.contains(newCourse)) {
@@ -62,20 +67,35 @@ public class Student extends Thread {
                 }
                 String toDrop = pickCourseToDrop();
                 if (toDrop != null) {
-                    registrar.tryDrop(id, toDrop);
+                    output = registrar.tryDrop(id, toDrop);
+                    if (VERBOSE) {
+                        System.out.println(output);
+                    }
+                    System.out.println(registrar.tryDrop(id, toDrop));
                     // can put sleep here to simulate time between dropping and adding again
                     String addResponse = registrar.tryAdd(id, newCourse);
+                    if (VERBOSE) {
+                        System.out.println(addResponse);
+                    }
+
                     if (addResponse.startsWith("[INFO] Enrolled student")) {
                         break;
                     } else {
-                        registrar.tryAdd(id, toDrop);
+                        output = registrar.tryAdd(id, toDrop);
+                        if (VERBOSE) {
+                            System.out.println(output);
+                        }
                     }
                 } else {
-                    registrar.tryAdd(id, newCourse);
+                    output = registrar.tryAdd(id, newCourse);
+                        if (VERBOSE) {
+                            System.out.println(output);
+                        }
                 }
             }
             if (currentCourses.containsAll(mostDesired)) {
-                System.out.println(id + " :-) " + currentCourses);
+                System.out.println("Student '" + id + "' got into all they're most desired classes in " + attempts
+                        + " attempts. Courseload is: " + currentCourses);
                 return;
             }
 
@@ -85,10 +105,16 @@ public class Student extends Thread {
             } catch (InterruptedException ignored) {
             }
         }
-        if (currentCourses.containsAll(mostDesired) || currentCourses.containsAll(alsoOk)) {
-            System.out.println(id + " :-| " + currentCourses);
+
+        if (currentCourses.containsAll(mostDesired)) {
+            System.out.println("After " + MAX_ATTEMPTS + " attempts, student '" + id
+                    + "' got into all they're most desired classes. Courseload is: " + currentCourses);
+        } else if (desired.containsAll(currentCourses)) {
+            System.out.println("After " + MAX_ATTEMPTS + " attempts, student '" + id
+                    + "' is at least ok with every course they are enrolled in. Courseload is: " + currentCourses);
         } else {
-            System.out.println(id + " :-( " + currentCourses);
+            System.out.println("After " + MAX_ATTEMPTS + " attempts, student '" + id
+                    + "' is enrolled in some courses they are not ok with. Courseload is: " + currentCourses);
         }
     }
 
@@ -101,13 +127,24 @@ public class Student extends Thread {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
-    public List getMostDesired() {
+    public List<String> getMostDesired() {
         return mostDesired;
     }
 
-    @SuppressWarnings("rawtypes")
-    public List getOk() {
+    public List<String> getOk() {
         return alsoOk;
     }
+
+    public String getStudId() {
+        return id;
+    }
+
+    public Registrar getRegistrar() {
+        return registrar;
+    }
+
+    public Set<String> getCurrentCourses() {
+        return currentCourses;
+    }
+
 }
