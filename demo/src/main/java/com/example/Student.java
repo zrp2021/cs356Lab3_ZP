@@ -71,7 +71,6 @@ public class Student extends Thread {
                     if (VERBOSE) {
                         System.out.println(output);
                     }
-                    System.out.println(registrar.tryDrop(id, toDrop));
                     // can put sleep here to simulate time between dropping and adding again
                     String addResponse = registrar.tryAdd(id, newCourse);
                     if (VERBOSE) {
@@ -95,7 +94,7 @@ public class Student extends Thread {
             }
             if (currentCourses.containsAll(mostDesired)) {
                 System.out.println("Student '" + id + "' got into all they're most desired classes in " + attempts
-                        + " attempts. Courseload is: " + currentCourses);
+                        + " attempts. Courseload is: " + currentCourses + "\tMost Desired was: " + mostDesired);
                 return;
             }
 
@@ -108,13 +107,10 @@ public class Student extends Thread {
 
         if (currentCourses.containsAll(mostDesired)) {
             System.out.println("After " + MAX_ATTEMPTS + " attempts, student '" + id
-                    + "' got into all they're most desired classes. Courseload is: " + currentCourses);
-        } else if (desired.containsAll(currentCourses)) {
-            System.out.println("After " + MAX_ATTEMPTS + " attempts, student '" + id
-                    + "' is at least ok with every course they are enrolled in. Courseload is: " + currentCourses);
+                    + "' got into all their most desired classes. Courseload is: " + currentCourses + "\tMost Desired was: " + mostDesired);
         } else {
             System.out.println("After " + MAX_ATTEMPTS + " attempts, student '" + id
-                    + "' is enrolled in some courses they are not ok with. Courseload is: " + currentCourses);
+                    + "' did not get all their most desired classes. Courseload is: " + currentCourses + "\tMost Desired was: " + mostDesired);
         }
     }
 

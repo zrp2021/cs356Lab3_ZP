@@ -17,6 +17,7 @@ public class Registrar {
     public final Map<String, Course> courses;
     public final Map<String, Student> students;
     public static final int DEFAULT_MAX_CAPACITY = 5;
+    public static final int DEFAULT_MAX_CART = 2;
 
     public Registrar(Map<String, Course> courses, Map<String, Student> students) {
         this.courses = courses;
@@ -51,7 +52,7 @@ public class Registrar {
             } else {
                 // delay to expose data race. Will allow too many students to join the course
                 try {
-                    Student.sleep(30);
+                    Student.sleep(1000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -144,19 +145,19 @@ public class Registrar {
     /**
      * make new student and add to students Map
      */
-    public Student makeRandomStudent(String id) {
+    public String makeRandomStudent(String id) {
         List<String> shuffled = new ArrayList<>(courses.keySet());
         Collections.shuffle(shuffled);
 
         int total = shuffled.size();
-        int desiredCount = Math.max(1, total / 3);
-        int okCount = Math.max(1, total / 3);
+        int desiredCount = Math.min(DEFAULT_MAX_CART, total);
+        int okCount = Math.min(DEFAULT_MAX_CART, total);
 
         List<String> mostDesired = new ArrayList<>(shuffled.subList(0, Math.min(desiredCount, total)));
         List<String> alsoOk = new ArrayList<>(shuffled.subList(Math.min(desiredCount, total), Math.min(desiredCount + okCount, total)));
 
         Student stud = new Student(id, this, mostDesired, alsoOk, new HashSet<>());
         students.put(id, stud);
-        return stud;
+        return "[AUTO] Created student '" + id + "'.\n";
     }
 }

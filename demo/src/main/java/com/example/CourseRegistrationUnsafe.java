@@ -24,6 +24,8 @@ import javax.swing.JTextField;
  */
 class RegistrationGUI {
 
+    private static final int AUTO_STUDENTS_LOOP = 100;
+    private static final int AUTO_COURSES_LOOP = 100;
     private final Registrar registrar;
     private final JFrame frame;
     private final JTextArea output;
@@ -45,13 +47,13 @@ class RegistrationGUI {
         JTextField courseNameField = new JTextField();
         JTextField capacityField = new JTextField();
         JButton addCourseBtn = new JButton("Add Course");
-        JButton autoCourseBtn = new JButton("Auto-generate Course");
+        JButton autoCourseBtn = new JButton("Auto-generate " + AUTO_COURSES_LOOP + " Course(s)");
 
         JTextField studentIdField = new JTextField();
         JTextField targetCourseField = new JTextField();
         JButton enrollBtn = new JButton("Enroll Student");
         JButton dropBtn = new JButton("Drop Student");
-        JButton autoStudentBtn = new JButton("Auto-generate Random Student");
+        JButton autoStudentBtn = new JButton("Auto-generate " + AUTO_STUDENTS_LOOP + " Random Student(s)");
 
         JButton refreshBtn = new JButton("Refresh Roster View");
 
@@ -180,17 +182,19 @@ class RegistrationGUI {
         });
 
         autoCourseBtn.addActionListener(e -> {
-            String name = "CS" + (Course.numCourses + 1);
-            int capacity = random.nextInt(Registrar.DEFAULT_MAX_CAPACITY) + 1;
-            registrar.courses.put(name, new Course(name, capacity));
-            appendOutput("[AUTO] Added course '" + name + "' with capacity " + capacity + ".\n");
+            for (int i = 0; i < AUTO_COURSES_LOOP; i++) {
+                String name = "CS" + (Course.numCourses + 1);
+                int capacity = random.nextInt(Registrar.DEFAULT_MAX_CAPACITY) + 1;
+                registrar.courses.put(name, new Course(name, capacity));
+                appendOutput("[AUTO] Added course '" + name + "' with capacity " + capacity + ".\n");
+            }
         });
 
         autoStudentBtn.addActionListener(e -> {
-            String id = "S" + (Student.numStudents + 1);
-            registrar.makeRandomStudent(id);
-            appendOutput("[AUTO] Created student '" + id + "'.\n");
-            studentIdField.setText(id);
+            for (int i = 0; i < AUTO_STUDENTS_LOOP; i++) {
+                String id = "S" + (Student.numStudents + 1);
+                appendOutput(registrar.makeRandomStudent(id));
+            }
         });
 
         frame.pack();
