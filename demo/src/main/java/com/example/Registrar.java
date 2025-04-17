@@ -49,6 +49,8 @@ public class Registrar {
             } else if (c.enrolled.size() >= c.capacity) {
                 return "[WARN] Enrollment failed: Course has " + c.capacity + " capacity and "
                         + c.enrolled.size() + " enrolled.\n\tStudent '" + studentId + "' is not enrolled in course '" + courseName + "'.\n";
+            } else if (stud.getCurrentCourses().size() >= 4) {
+                return "[WARN] Enrollment failed: Student '" + studentId + "' already has 4 courses.\n";
             } else {
                 // delay to expose data race. Will allow too many students to join the course
                 try {
@@ -60,7 +62,7 @@ public class Registrar {
 
                 stud.addCurrent(courseName);
                 return "[INFO] Enrolled student '" + studentId + "' in course '" + courseName
-                        + "'.\n\tNew enrolled/capacity is " + c.enrolled.size() + "/" + c.capacity + ".\n";
+                        + "'.\n\tThe enrolled vs capacity ratio is now " + c.enrolled.size() + "/" + c.capacity + ".\n";
             }
         }
     }
