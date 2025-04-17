@@ -22,7 +22,7 @@ import javax.swing.JTextField;
 /**
  * Provides a GUI for manually managing courses and student registrations.
  */
-class RegistrationGUI {
+public class RegistrationGUI {
 
     private static final int AUTO_STUDENTS_LOOP = 100;
     private static final int AUTO_COURSES_LOOP = 100;
@@ -206,12 +206,6 @@ class RegistrationGUI {
         output.append(text);
         output.setCaretPosition(output.getDocument().getLength());
     }
-}
-
-/**
- * Main class to run the simulation with multiple student threads.
- */
-public class CourseRegistrationUnsafe {
 
     public static void main(String[] args) {
         Map<String, Course> courseMap = new HashMap<>();

@@ -85,11 +85,11 @@ public class Student extends Thread {
                         // BUT...
                         // delay to expose data race. Other students shouldn't be able to join the dropped course 
                         // before this student can re-enroll (in the event that they can't get into the new course)
-                        try {
-                            Student.sleep(1000);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
+                        // try {
+                        //     Student.sleep(1000);
+                        // } catch (InterruptedException e) {
+                        //     Thread.currentThread().interrupt();
+                        // }
                         output = registrar.tryAdd(id, toDrop);
                         if (VERBOSE) {
                             System.out.println(output);
@@ -109,10 +109,10 @@ public class Student extends Thread {
             }
 
             // time between attempted actions by student threads
-            try {
-                Student.sleep(random.nextInt(100));
-            } catch (InterruptedException ignored) {
-            }
+            // try {
+            //     Student.sleep(random.nextInt(100));
+            // } catch (InterruptedException ignored) {
+            // }
         }
 
         if (currentCourses.containsAll(mostDesired)) {
