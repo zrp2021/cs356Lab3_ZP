@@ -4,7 +4,6 @@ package com.example;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -21,7 +20,6 @@ public class Student extends Thread {
     private final List<String> mostDesired;
     private final List<String> alsoOk;
     private final Set<String> currentCourses;
-    private final Random random;
 
     public static int numStudents = 0;
 
@@ -31,7 +29,6 @@ public class Student extends Thread {
         this.mostDesired = mostDesired;
         this.alsoOk = alsoOk;
         this.currentCourses = initialCourses;
-        this.random = new Random();
         numStudents++;
     }
 
